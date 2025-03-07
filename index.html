@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐歌单</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        #filterInput {
+            width: 70%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        #clearFilter {
+            width: 25%;
+            padding: 12px;
+            background-color: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #clearFilter:hover {
+            background-color: #ff4c4c;
+        }
+        #randomSong {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #randomSong:hover {
+            background-color: #0056b3;
+        }
+        #songList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #songList li {
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        #songList li:hover {
+            background-color: #f1f1f1;
+        }
+        .song-info {
+            font-size: 18px;
+            color: #555;
+        }
+        .song-info small {
+            color: #888;
+            font-size: 14px;
+        }
+        .no-results {
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>音乐歌单</h1>
+    <input type="text" id="filterInput" placeholder="输入关键词筛选歌名或歌手...">
+    <button id="clearFilter">清空筛选</button>
+    <button id="randomSong">随便听听</button>
+    <ul id="songList"></ul>
+    <div id="noResults" class="no-results" style="display: none;">暂无歌单，愿意留个作业吗？</div>
+
+    <script>
+        // 歌单数据
+        const songs = [
+            { title: "枫", artist: "周杰伦" },
+            { title: "稻香", artist: "周杰伦" },
+            { title: "夜曲", artist: "周杰伦" },
+            { title: "搁浅", artist: "周杰伦" },
+            { title: "安静", artist: "周杰伦" },
+            { title: "晴天", artist: "周杰伦" },
+            { title: "花海", artist: "周杰伦" },
+            { title: "暗号", artist: "周杰伦" },
+            { title: "分裂", artist: "周杰伦" },
+            { title: "对不起", artist: "周杰伦" },
+            { title: "园游会", artist: "周杰伦" },
+            { title: "美人鱼", artist: "周杰伦" },
+            { title: "大笨钟", artist: "周杰伦" },
+            { title: "兰亭序", artist: "周杰伦" },
+            { title: "简单爱", artist: "周杰伦" },
+            { title: "发如雪", artist: "周杰伦" },
+            { title: "明明就", artist: "周杰伦" },
+            { title: "我不配", artist: "周杰伦" },
+            { title: "青花瓷", artist: "周杰伦" },
+            { title: "七里香", artist: "周杰伦" },
+            { title: "珊瑚海", artist: "周杰伦" },
+            { title: "牛仔很忙", artist: "周杰伦" },
+            { title: "可爱女人", artist: "周杰伦" },
+            { title: "爱情悬崖", artist: "周杰伦" },
+            { title: "自导自演", artist: "周杰伦" },
+            { title: "烟花易冷", artist: "周杰伦" },
+            { title: "说好不哭", artist: "周杰伦" },
+            { title: "告白气球", artist: "周杰伦" },
+            { title: "黑色毛衣", artist: "周杰伦" },
+            { title: "红尘客栈", artist: "周杰伦" },
+            { title: "半岛铁盒", artist: "周杰伦" },
+            { title: "断了的弦", artist: "周杰伦" },
+            { title: "一路向北", artist: "周杰伦" },
+            { title: "爱情废柴", artist: "周杰伦" },
+            { title: "最长的电影", artist: "周杰伦" },
+            { title: "爱在西元前", artist: "周杰伦" },
+            { title: "超人不会飞", artist: "周杰伦" },
+            { title: "米兰的小铁匠", artist: "周杰伦" },
+            { title: "蒲公英的约定", artist: "周杰伦" },
+            { title: "我是如此相信", artist: "周杰伦" },
+            { title: "说好的幸福呢", artist: "周杰伦" },
+            { title: "给我一首歌的时间", artist: "周杰伦" },
+            { title: "我落泪情绪零碎", artist: "周杰伦" },
+            { title: "内线", artist: "许嵩" },
+            { title: "幻听", artist: "许嵩" },
+            { title: "素颜", artist: "许嵩" },
+            { title: "庐州月", artist: "许嵩" },
+            { title: "燕归巢", artist: "许嵩" },
+            { title: "千百度", artist: "许嵩" },
+            { title: "拆东墙", artist: "许嵩" },
+            { title: "想象之中", artist: "许嵩" },
+            { title: "白马非马", artist: "许嵩" },
+            { title: "敬酒不吃", artist: "许嵩" },
+            { title: "有何不可", artist: "许嵩" },
+            { title: "半城烟沙", artist: "许嵩" },
+            { title: "最佳歌手", artist: "许嵩" },
+            { title: "灰色头像", artist: "许嵩" },
+            { title: "雅俗共赏", artist: "许嵩" },
+            { title: "多余的解释", artist: "许嵩" },
+            { title: "玫瑰花的葬礼", artist: "许嵩" },
+            { title: "天龙八部之宿敌", artist: "许嵩" },
+            { title: "画", artist: "邓紫棋" },
+            { title: "再见", artist: "邓紫棋" },
+            { title: "倒数", artist: "邓紫棋" },
+            { title: "句号", artist: "邓紫棋" },
+            { title: "唯一", artist: "邓紫棋" },
+            { title: "泡沫", artist: "邓紫棋" },
+            { title: "盲点", artist: "邓紫棋" },
+            { title: "囚鸟", artist: "邓紫棋" },
+            { title: "瞬间", artist: "邓紫棋" },
+            { title: "龙卷风", artist: "邓紫棋" },
+            { title: "桃花诺", artist: "邓紫棋" },
+            { title: "我的秘密", artist: "邓紫棋" },
+            { title: "光年之外", artist: "邓紫棋" },
+            { title: "一路逆风", artist: "邓紫棋" },
+            { title: "查克靠近", artist: "邓紫棋" },
+            { title: "冰河时代", artist: "邓紫棋" },
+            { title: "不想回家", artist: "邓紫棋" },
+            { title: "岩石里的花", artist: "邓紫棋" },
+            { title: "你把我灌醉", artist: "邓紫棋" },
+            { title: "写不完的温柔", artist: "邓紫棋" },
+            { title: "来自天堂的魔鬼", artist: "邓紫棋" },
+            { title: "让世界暂停一分钟", artist: "邓紫棋" },
+            { title: "你不是真正的快乐", artist: "邓紫棋" },
+            { title: "她说", artist: "林俊杰" },
+            { title: "当你", artist: "林俊杰" },
+            { title: "江南", artist: "林俊杰" },
+            { title: "谢幕", artist: "林俊杰" },
+            { title: "木乃伊", artist: "林俊杰" },
+            { title: "学不会", artist: "林俊杰" },
+            { title: "我还想她", artist: "林俊杰" },
+            { title: "可惜没如果", artist: "林俊杰" },
+            { title: "背对背拥抱", artist: "林俊杰" },
+            { title: "黑夜问白天", artist: "林俊杰" },
+            { title: "爱笑的眼睛", artist: "林俊杰" },
+            { title: "一千年以后", artist: "林俊杰" },
+            { title: "不为谁而作的歌", artist: "林俊杰义" },
+            { title: "那些你很冒险的梦", artist: "林俊杰" },
+            { title: "怕", artist: "杨丞琳" },
+            { title: "暧昧", artist: "杨丞琳" },
+            { title: "雨爱", artist: "杨丞琳" },
+            { title: "点水", artist: "杨丞琳" },
+            { title: "观众", artist: "杨丞琳" },
+            { title: "暗涌", artist: "杨丞琳" },
+            { title: "仰望", artist: "杨丞琳" },
+            { title: "年轮说", artist: "杨丞琳" },
+            { title: "我想爱", artist: "杨丞琳" },
+            { title: "带我走", artist: "杨丞琳" },
+            { title: "喜剧收场", artist: "杨丞琳" },
+            { title: "黑色月亮", artist: "杨丞琳" },
+            { title: "与我无关", artist: "杨丞琳" },
+            { title: "想幸福的人", artist: "杨丞琳" },
+            { title: "匿名的好友", artist: "杨丞琳" },
+            { title: "失忆的金鱼", artist: "杨丞琳" },
+            { title: "以年为单位的爱情", artist: "杨丞琳" },
+            { title: "风筝", artist: "孙燕姿" },
+            { title: "遇见", artist: "孙燕姿" },
+            { title: "天黑黑", artist: "孙燕姿" },
+            { title: "我怀念的", artist: "孙燕姿" },
+            { title: "在也不见", artist: "孙燕姿" },
+            { title: "开始懂了", artist: "孙燕姿" },
+            { title: "半句再见", artist: "孙燕姿太" },
+            { title: "honeyhoney", artist: "孙燕姿" },
+            { title: "直来直往", artist: "孙燕姿" },
+            { title: "勇气", artist: "梁静茹" },
+            { title: "暖暖", artist: "梁静茹" },
+            { title: "慢冷", artist: "梁静茹" },
+            { title: "情歌", artist: "梁静茹" },
+            { title: "夜夜夜夜", artist: "梁静茹" },
+            { title: "没有如果", artist: "梁静茹" },
+            { title: "会呼吸的痛", artist: "梁静茹" },
+            { title: "爱久见人心", artist: "梁静茹" },
+            { title: "给未来的自己", artist: "梁静茹" },
+            { title: "那年", artist: "任然" },
+            { title: "凉城", artist: "任然" },
+            { title: "飞机", artist: "任然" },
+            { title: "疑心病", artist: "任然" },
+            { title: "后继者", artist: "任然" },
+            { title: "同花顺", artist: "任然" },
+            { title: "外婆桥", artist: "任然" },
+            { title: "无人之岛", artist: "任然" },
+            { title: "飞鸟与蝉", artist: "任然" },
+            { title: "一步之遥", artist: "任然" },
+            { title: "失恋俱乐部", artist: "任然" },
+        ];
+
+        // 渲染歌单
+        function renderSongList(songsToRender) {
+            const songList = document.getElementById('songList');
+            const noResults = document.getElementById('noResults');
+            songList.innerHTML = '';
+
+            if (songsToRender.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                songsToRender.forEach(song => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="song-info">
+                            <strong>${song.title}</strong>
+                            <small>${song.artist}</small>
+                        </div>
+                    `;
+                    songList.appendChild(li);
+                });
+            }
+        }
+
+        // 关键词筛选功能
+        document.getElementById('filterInput').addEventListener('input', function () {
+            const query = this.value.trim().toUpperCase();
+            const filteredSongs = songs.filter(song => {
+                return (
+                    song.title.toUpperCase().includes(query) ||
+                    song.artist.toUpperCase().includes(query)
+                );
+            });
+            renderSongList(filteredSongs);
+        });
+
+        // 清空筛选功能
+        document.getElementById('clearFilter').addEventListener('click', function () {
+            document.getElementById('filterInput').value = '';
+            renderSongList(songs);
+        });
+
+        // 随便听听功能
+        document.getElementById('randomSong').addEventListener('click', function () {
+            const randomSong = songs[Math.floor(Math.random() * songs.length)];
+            alert(`🎵 随机推荐：${randomSong.title} - ${randomSong.artist}`);
+        });
+
+        // 初始渲染
+        renderSongList(songs);
+    </script>
+</body>
+</html>

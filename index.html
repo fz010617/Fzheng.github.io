@@ -866,17 +866,20 @@
             renderSongList(songs);
         });
 
-        // 随便听听功能
-        document.getElementById('randomSong').addEventListener('click', function () {
-            const randomSong = songs[Math.floor(Math.random() * songs.length)];
-            const songInfo = `${randomSong.title} - ${randomSong.artist}`;
-            // 复制到剪贴板
-            navigator.clipboard.writeText(songInfo)
-                .then(() => {
-                    alert(`🎵 随机推荐：${songInfo}\n（已复制到剪贴板）`);
-                })
-                .catch(() => {
-                    alert(`🎵 随机推荐：${songInfo}`);
+    // 随便听听功能
+document.getElementById('randomSong').addEventListener('click', function () {
+    const randomSong = songs[Math.floor(Math.random() * songs.length)];
+    let songInfo = randomSong.title; // 默认只复制歌名
+    if (randomSong.artist) {
+        songInfo = `${randomSong.title} ${randomSong.artist}`; // 如果有歌手，加上歌手
+    }
+    // 复制到剪贴板
+    navigator.clipboard.writeText(songInfo)
+        .then(() => {
+            alert(`🎵 随机推荐：${songInfo}\n（已复制到剪贴板）`);
+        })
+        .catch(() => {
+            alert(`🎵 随机推荐：${songInfo}`);
                 });
         });
 
